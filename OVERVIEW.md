@@ -110,7 +110,7 @@ sequenceDiagram
 | **Real agent integration** | Registered with Claude Code; an actual LLM agent can call it | see README |
 
 **Two repos:**
-- [`context-wall-poc`](https://github.com/shirley-xue-2025/context-wall-poc) — the firewall, MCP server, demos, dashboard (this repo).
+- [`context-wall-hackathon`](https://github.com/shirley-xue-2025/context-wall-hackathon) — the firewall, MCP server, demos, dashboard (this repo).
 - [`Context-wall-mock-actor`](https://github.com/shirley-xue-2025/Context-wall-mock-actor) — the Apify actor that produces the demo data (clean / hard / soft).
 
 ## 5. See it yourself in 5 minutes

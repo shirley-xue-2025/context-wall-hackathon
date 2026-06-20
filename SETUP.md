@@ -8,14 +8,14 @@ Two repos make up the project:
 
 | Repo | What it is |
 |------|------------|
-| `context-wall-poc` | The firewall + MCP server + demos (this repo) |
+| `context-wall-hackathon` | The firewall + MCP server + demos (this repo) |
 | `Context-wall-mock-actor` | The Apify actor that produces the demo data |
 
 Ask Shirley to add you as a **collaborator** on both (GitHub → repo → Settings → Collaborators), then:
 
 ```bash
-git clone https://github.com/shirley-xue-2025/context-wall-poc.git
-cd context-wall-poc
+git clone https://github.com/shirley-xue-2025/context-wall-hackathon.git
+cd context-wall-hackathon
 npm install
 ```
 
