@@ -122,8 +122,8 @@ sequenceDiagram
 | **Real agent integration** | Registered with Claude Code; an actual LLM agent can call it | see README |
 
 **The pieces:**
-- [`context-wall-poc`](https://github.com/shirley-xue-2025/context-wall-poc) — the firewall, MCP server, demos, dashboard (this repo).
-- **`context-wall-real-actor`** — the Apify actor that **actually scrapes real URLs** (the live demo). Anti-bot sites hand it a genuine block page, so the demo is a real block, not a fixture. Deployed as `polite_bedbug/context-wall-real-actor`.
+- [`context-wall-hackathon`](https://github.com/shirley-xue-2025/context-wall-hackathon) — the firewall, MCP server, demos, dashboard (this repo).
+- [`context-wall-real-actor`](https://github.com/shirley-xue-2025/context-wall-real-actor) — the Apify actor that **actually scrapes real URLs** (the live demo). Anti-bot sites hand it a genuine block page, so the demo is a real block, not a fixture. Deployed as `polite_bedbug/context-wall-real-actor`.
 - [`Context-wall-mock-actor`](https://github.com/shirley-xue-2025/Context-wall-mock-actor) — the older fixture actor (fixed clean / block / mismatch rows), kept for deterministic offline-style demos.
 
 ## 5. See it yourself in 5 minutes
