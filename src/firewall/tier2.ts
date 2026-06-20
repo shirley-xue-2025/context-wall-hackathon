@@ -22,8 +22,10 @@ export async function judgeSample(
     v = hasLlm() ? await judgeSemantic(intent, sample, signal) : heuristic(intent, sample);
   } catch (err) {
     if (signal?.aborted) return pass(); // already killed by Tier 1; nothing to add
-    // Fail OPEN on judge errors so we never block real data on an outage.
-    return pass();
+    // On an LLM error (e.g. free-tier rate limit), DEGRADE to the mechanical
+    // heuristic rather than failing open — a firewall must not wave data
+    // through just because its smartest check was unavailable.
+    v = heuristic(intent, sample);
   }
 
   if (v.isBlockPage) {
