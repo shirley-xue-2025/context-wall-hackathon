@@ -1,0 +1,35 @@
+{
+  "name": "context-wall",
+  "version": "0.1.0",
+  "description": "An intelligent data firewall for AI agents — a circuit breaker in the MCP tool layer that stops toxic scraped data from poisoning agent context.",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": {
+    "context-wall": "./dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "demo": "tsx src/demo/runDemo.ts",
+    "demo:clean": "tsx src/demo/runDemo.ts clean",
+    "demo:hard": "tsx src/demo/runDemo.ts hard",
+    "demo:soft": "tsx src/demo/runDemo.ts soft",
+    "demo:live": "tsx src/demo/runLive.ts",
+    "dashboard": "tsx src/web/server.ts",
+    "agent": "tsx src/demo/agentSim.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^0.8.0",
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "apify-client": "^2.9.0",
+    "dotenv": "^16.4.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^20.14.0"
+  }
+}
