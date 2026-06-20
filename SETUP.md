@@ -53,10 +53,32 @@ Then edit `.env`:
 - **`OPENROUTER_API_KEY`** — optional, leave blank.
 - Set **`CW_SCRAPER=apify`** to use the live cloud actor (or `mock` for offline).
 
-## 4. Run the LIVE demo (real Apify actor + real Gemini judge)
+## 4. Run the LIVE demo
+
+### 4a. Real scrape of a real URL (the headline demo)
+
+Needs `APIFY_TOKEN`, `CW_SCRAPER=apify`, and
+`APIFY_DEFAULT_ACTOR=polite_bedbug/context-wall-real-actor` in `.env`.
 
 ```bash
-npm run demo:live hard   # Cloudflare block → Tier 1 aborts the real cloud run
+npm run demo:url               # homedepot.com → HTTP 200 "success" that's really a
+                               #   bot wall → Tier 1 trips on content, run aborts
+npm run demo:url -- cloudflare # yellowpages.com → 403 "Attention Required | Cloudflare"
+npm run demo:url -- clean      # books.toscrape.com → real data, passes
+npm run demo:url -- https://any-site.com   # any URL
+```
+
+This actually fetches the URL via the deployed `context-wall-real-actor`. A
+bot-protected site returns a genuine block page — a real block, not a fixture.
+
+> ⚠️ Anti-bot protection drifts, and the actor runs from a **datacenter IP**
+> (different responses than your laptop). Before a live demo, re-verify the
+> blocked URLs from the cloud, not locally.
+
+### 4b. Fixture actor + real Gemini judge (deterministic)
+
+```bash
+npm run demo:live hard   # fixed block fixture → Tier 1 aborts the real cloud run
 npm run demo:live soft   # mismatch → Gemini judge aborts the run
 npm run demo:live clean  # genuine data → passes
 ```
@@ -86,20 +108,28 @@ npm run build
 
 The server exposes one tool: `scrape_validated`.
 
-## Working on the Apify actor
+## Working on the Apify actors
+
+There are two actors. The **real actor** (`context-wall-real-actor`) powers the
+live demo — it actually scrapes URLs. The **mock actor** (`context-wall-mock-actor`)
+streams fixed fixtures. Both deploy the same way:
 
 ```bash
-git clone https://github.com/shirley-xue-2025/Context-wall-mock-actor.git
-cd Context-wall-mock-actor
+cd <actor-dir>                         # e.g. Context-wall-real-actor
 npm install
 node src/main.js                       # quick local sanity run
 
-# deploy your changes to the Apify org actor:
+# deploy to the Apify org:
 npx apify-cli login -t <YOUR_APIFY_TOKEN>
-npx apify-cli push <ACTOR_ID>          # uploads source + builds in the cloud
+npx apify-cli push                     # uploads source + builds in the cloud
 ```
 
-`apify push` uploads the source directly — no GitHub deploy key required.
+`apify push` uploads the source directly — **no GitHub repo or deploy key
+required** (GitHub-linked builds failed before on a private repo with no key).
+
+> The real actor's source lives in a plain folder, not (yet) a git repo. `apify
+> push` keeps the built image, but keep the source backed up — a repo is
+> recommended for history, not required to deploy.
 
 ## Layout cheat-sheet
 

@@ -79,3 +79,11 @@ time. It's the seatbelt for autonomous data.
   over 90% of the cost, gone."*
 - The two failure modes in plain words: *"Garbage that looks real"* (a disguised
   error page) and *"real but wrong"* (the opposite of what was asked).
+- The real, live example (use it — it beats a made-up one): *"We point our
+  scraper at Home Depot. The site quietly serves back its bot-blocker page
+  instead of the products — and stamps it 'success.' Every normal pipeline would
+  feed that to the AI as if it were real data. ContextWall reads what's actually
+  in the page, sees it's a block, and pulls the plug — before the agent is
+  poisoned or the bill runs up."*
+- Why we don't just trust the error code: *"A blocked page can label itself
+  'success' — so we don't trust the label, we read the actual content."*

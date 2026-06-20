@@ -2,13 +2,15 @@
 
 **An intelligent data firewall for AI agents.** A circuit breaker that lives in
 the MCP tool-invocation layer, intercepts scraper output, and stops toxic data
-(Cloudflare blocks, CAPTCHAs, semantic garbage) from poisoning an agent's
+(bot-blocker pages, CAPTCHAs, semantic garbage) from poisoning an agent's
 context window and burning its token budget.
 
-> Web scraping has a ~5% unavoidable failure rate. When it fails, platforms
-> still return **HTTP 200** with trash HTML wrapped in clean JSON. Downstream
-> agents ingest it blindly → hallucination + wasted LLM spend. ContextWall is
-> the runtime gatekeeper that catches it.
+> Web scraping has a ~5% unavoidable failure rate. When it fails, sites often
+> still return **HTTP 200 "success"** — but the body is a bot-blocker page, not
+> data (we catch a real one live: `homedepot.com` → 200 + "Powered and protected
+> by Privacy"). Downstream agents ingest it blindly → hallucination + wasted LLM
+> spend. ContextWall is the runtime gatekeeper that catches it — by reading the
+> content, never trusting the status code.
 
 **👋 New here?** Read **[OVERVIEW.md](OVERVIEW.md)** first — the full picture
 (problem, how it works, everything we've built, diagrams, glossary) in one page.
@@ -22,7 +24,7 @@ context window and burning its token budget.
 ```bash
 npm install
 npm run demo            # all 3 scenarios
-npm run demo:hard       # Cloudflare hard-fail  → Tier 1 trips at row 1
+npm run demo:hard       # block page (fixture)  → Tier 1 trips at row 1
 npm run demo:soft       # semantic mismatch     → Tier 2 trips at row 3
 npm run demo:clean      # genuine data          → passes, 12/12 delivered
 ```
@@ -30,6 +32,21 @@ npm run demo:clean      # genuine data          → passes, 12/12 delivered
 Add a `GEMINI_API_KEY` (see `.env.example`) to swap the offline heuristic for
 the real LLM judge. Add an `APIFY_TOKEN` and set `CW_SCRAPER=apify` to firewall
 live scrapes.
+
+### Live real-scrape demo (the undeniable one)
+
+```bash
+npm run demo:url               # homedepot.com → HTTP 200 "success" that's really
+                               #   a bot wall → Tier 1 trips on the content, run aborts
+npm run demo:url -- cloudflare # yellowpages.com → 403 "Attention Required | Cloudflare"
+npm run demo:url -- clean      # books.toscrape.com → real data, passes
+npm run demo:url -- https://any-site.com   # scrape any URL through the firewall
+```
+
+This drives **`context-wall-real-actor`**, a deployed Apify actor that *actually
+fetches the URL*. Anti-bot sites hand it a genuine block page — so the demo is a
+real block in the wild, not a fixture we wrote. Needs `APIFY_TOKEN` +
+`CW_SCRAPER=apify` + `APIFY_DEFAULT_ACTOR=polite_bedbug/context-wall-real-actor`.
 
 ### Live web dashboard (the judge-facing demo)
 
@@ -65,8 +82,10 @@ upstream rows ──stream──▶ Tier 1 (per item, ~ms, pure code) ──┐
 ```
 
 - **Tier 1 — Mechanical:** Zod-style shape check + regex blocklist
-  (`Cloudflare`, `CAPTCHA`, `Access Denied`, …). Runs on **every** item the
-  instant it arrives → fail-fast on the first poisoned row.
+  (`Cloudflare`, `CAPTCHA`, `Access Denied`, `Powered and protected by Privacy`,
+  …). Reads the **content**, so it catches a block whether the page came back as
+  `200` or `403`. Runs on **every** item the instant it arrives → fail-fast on
+  the first poisoned row.
 - **Tier 2 — Semantic:** one LLM call on the first `N` buffered items
   (default 3), running **concurrently** while more rows stream. Catches
   "asked for *delivery*, got *no delivery*".
@@ -82,12 +101,21 @@ tier, low latency. OpenRouter wired as an optional fallback. Keys you need:
 (console.apify.com/settings/integrations).
 
 ### 4. Demo harness *(Task 4)*
-`src/mock/` ships a mock Apify actor that streams three fixtures row-by-row and
-honours `AbortSignal` exactly like the cloud client. The `hard` fixture is the
-killer: perfectly-shaped JSON whose *values* are all Cloudflare text — HTTP 200,
-passes a naive schema check, 100% toxic. The terminal dashboard
-(`src/demo/dashboard.ts`) renders the verdict, the **rows-produced vs total**
-ratio (proof the breaker fired early), and **tokens / $ saved**.
+Two ways to drive the firewall:
+- **Offline fixtures** — `src/mock/` streams three fixed scenarios row-by-row and
+  honours `AbortSignal` exactly like the cloud client. The `hard` fixture mirrors
+  the real thing: perfectly-shaped JSON whose *values* are block-page text — HTTP
+  200, passes a naive schema check, 100% toxic. Deterministic, zero-cost, no
+  network — the safe fallback for a live stage.
+- **Real scrape** — `npm run demo:url` (`src/demo/runLiveUrl.ts`) drives the
+  deployed `context-wall-real-actor` against a real URL. A bot-protected site
+  returns a genuine block page (e.g. `homedepot.com` → HTTP 200 + "Powered and
+  protected by Privacy"); Tier 1 trips on the **content** and aborts the cloud
+  run. A real block in the wild, not a fixture.
+
+The terminal dashboard (`src/demo/dashboard.ts`) renders the verdict, the
+**rows-produced vs total** ratio (proof the breaker fired early), and
+**tokens / $ saved**.
 
 ---
 
