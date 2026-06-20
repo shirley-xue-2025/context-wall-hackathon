@@ -1,4 +1,10 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import { fileURLToPath } from "node:url";
+
+// Load .env by ABSOLUTE path (next to the project root), not the current working
+// directory — so the server picks up keys no matter where an MCP client spawns
+// it from. Falls back silently if the file isn't there.
+loadEnv({ path: fileURLToPath(new URL("../.env", import.meta.url)) });
 
 export const config = {
   gemini: {
