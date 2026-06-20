@@ -21,6 +21,25 @@ const BLOCKLIST: RegExp[] = [
   /just\s+a\s+moment/i, // Cloudflare interstitial title
   /\b40[13]\b.*forbidden|forbidden.*\b40[13]\b/i,
   /bot\s+detection|automated\s+traffic/i,
+  // Modern block-page phrasing observed from real anti-bot vendors when a plain
+  // HTTP client (got-scraping, no JS) hits a protected site. These complement
+  // the classics above so the firewall catches today's interstitials, not just
+  // the 2020-era Cloudflare ones. (Verified live against zillow/crunchbase/g2.)
+  /one\s+moment,?\s*please/i, // newer Cloudflare challenge title
+  /access\s+to\s+this\s+page\s+has\s+been\s+denied/i, // PerimeterX / HUMAN
+  /checking\s+your\s+browser/i, // Cloudflare "checking your browser before…"
+  /\bray\s*id\b/i, // Cloudflare error-page signature (always present)
+  /enable\s+js\b/i, // terse variant of "enable JavaScript"
+  /humans\s+only/i, // Akamai/Glassdoor-style anti-bot wall
+  /pardon\s+our\s+interruption/i, // Imperva/Distil
+  /unusual\s+(traffic|activity)/i, // Google/general rate-block
+  /verify\s+(your|the)\s+(session|request|connection|identity)/i,
+  /\bperimeterx\b|\bdatadome\b/i, // vendor names leaking into the block page
+  // The DANGEROUS case: Akamai's bot wall is served at HTTP 200 (not 403), so
+  // there is NO status-code signal — the only tell is this phrase in the body.
+  // Exactly the "200 success, poison content" payload ContextWall exists for.
+  /powered\s+and\s+protected\s+by\s+privacy/i, // Akamai bot-manager interstitial
+  /you\s+have\s+been\s+blocked/i, // Cloudflare "Sorry, you have been blocked"
 ];
 
 export interface Tier1Options {

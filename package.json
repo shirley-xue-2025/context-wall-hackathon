@@ -16,6 +16,7 @@
     "demo:hard": "tsx src/demo/runDemo.ts hard",
     "demo:soft": "tsx src/demo/runDemo.ts soft",
     "demo:live": "tsx src/demo/runLive.ts",
+    "demo:url": "tsx src/demo/runLiveUrl.ts",
     "dashboard": "tsx src/web/server.ts",
     "agent": "tsx src/demo/agentSim.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
