@@ -53,9 +53,7 @@ Then edit `.env`:
 - **`OPENROUTER_API_KEY`** — optional, leave blank.
 - Set **`CW_SCRAPER=apify`** to use the live cloud actor (or `mock` for offline).
 
-## 4. Run the LIVE demo
-
-### 4a. Real scrape of a real URL (the headline demo)
+## 4. Run the LIVE demo (real scrape of a real URL)
 
 Needs `APIFY_TOKEN`, `CW_SCRAPER=apify`, and
 `APIFY_DEFAULT_ACTOR=polite_bedbug/context-wall-real-actor` in `.env`.
@@ -70,21 +68,17 @@ npm run demo:url -- https://any-site.com   # any URL
 
 This actually fetches the URL via the deployed `context-wall-real-actor`. A
 bot-protected site returns a genuine block page — a real block, not a fixture.
+Keep the **Apify console → Runs** tab open — you'll watch the run flip to
+**ABORTED** in real time when the breaker trips.
 
 > ⚠️ Anti-bot protection drifts, and the actor runs from a **datacenter IP**
 > (different responses than your laptop). Before a live demo, re-verify the
 > blocked URLs from the cloud, not locally.
 
-### 4b. Fixture actor + real Gemini judge (deterministic)
-
-```bash
-npm run demo:live hard   # fixed block fixture → Tier 1 aborts the real cloud run
-npm run demo:live soft   # mismatch → Gemini judge aborts the run
-npm run demo:live clean  # genuine data → passes
-```
-
-Keep the **Apify console → Runs** tab open while you do this — you'll watch the run
-flip to **ABORTED** in real time when the breaker trips.
+**To show Tier 2 (the LLM judge) live**, use the semantic-mismatch scenario —
+data that's clean but wrong-for-the-intent, which only the LLM catches. Set
+`GEMINI_API_KEY` and run `npm run demo:soft` (or flip the dashboard to that
+scenario). Tier 1's block cases above don't exercise the LLM.
 
 ## 5. The web dashboard (best for showing people)
 
@@ -140,5 +134,5 @@ src/firewall/tier2.ts   semantic LLM judge (+ offline heuristic)
 src/providers/apify.ts  live Apify adapter (polling stream + run.abort())
 src/providers/llm.ts    Gemini structured-output client
 src/mock/               offline fixtures + streaming mock scraper
-src/demo/               runDemo.ts (offline) · runLive.ts (live) · dashboard.ts
+src/demo/               runDemo.ts (offline) · runLiveUrl.ts (live real scrape) · dashboard.ts
 ```

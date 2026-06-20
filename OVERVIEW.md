@@ -114,10 +114,9 @@ sequenceDiagram
 | **Scraper adapters** | Vendor-agnostic interface; live Apify + offline mock | `src/providers/` |
 | **Apify real actor** | A deployed cloud actor that **actually scrapes any URL** — anti-bot sites hand it a real block page (`context-wall-real-actor`) | `Context-wall-real-actor` |
 | **Apify mock actor** | Older deployed actor that streams fixed clean / block / mismatched fixtures on demand (`context-wall-mock-actor`) | `Context-wall-mock-actor` |
-| **5 ways to see it run** | ↓ | ↓ |
+| **4 ways to see it run** | ↓ | ↓ |
 | · Offline terminal demo | All 3 scenarios, no keys needed | `npm run demo` |
 | · Live **real-scrape** demo | Scrapes a real URL; anti-bot sites trip the firewall | `npm run demo:url` |
-| · Live fixture demo | Runs the older fixture actor in the cloud | `npm run demo:live hard` |
 | · Buyer-agent simulator | A fake agent talks to us over real MCP and decides buy / don't-buy | `npm run agent` |
 | · Web dashboard | Live animated funnel + tokens/$ saved | `npm run dashboard` → localhost:4000 |
 | **Real agent integration** | Registered with Claude Code; an actual LLM agent can call it | see README |
